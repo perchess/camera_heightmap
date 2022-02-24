@@ -1,8 +1,8 @@
 <?xml version="1.0"?>
 <package format="2">
-  <name>my_pcl</name>
+  <name>camera_heightmap</name>
   <version>0.0.0</version>
-  <description>The my_pcl package</description>
+  <description>The camera_heightmap package</description>
 
   <!-- One maintainer tag required, multiple allowed, one person per tag -->
   <!-- Example:  -->

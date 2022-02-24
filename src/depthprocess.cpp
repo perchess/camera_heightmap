@@ -8,7 +8,7 @@
 #include <opencv2/opencv.hpp>
 #include <image_transport/image_transport.h>
 #include <cv_bridge/cv_bridge.h>
-#include <opencv/highgui.h>
+#include <opencv2/highgui.hpp>
 #include <stdio.h>
 #include <stdlib.h>
 

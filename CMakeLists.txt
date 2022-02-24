@@ -14,7 +14,7 @@ find_package(catkin REQUIRED COMPONENTS
         cv_bridge
         image_transport
 )
-find_package(OpenCV REQUIRED)
+find_package(OpenCV 4.2 EXACT REQUIRED)
 include_directories(${OpenCV_INCLUDE_DIRS})
 
 catkin_package(
