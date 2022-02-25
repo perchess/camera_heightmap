@@ -8,6 +8,7 @@
 //ros 相关
 #include <ros/ros.h>
 #include <ros/console.h>
+#include <ros/package.h>
 // PCL specific includes PCL 的相关的头文件
 #include <sensor_msgs/PointCloud2.h>
 #include <pcl_conversions/pcl_conversions.h>
@@ -50,9 +51,8 @@ float round2(float dVal, short iPlaces) {
     return(dRetval);
 }
 
-//回调函数  xyz直通滤波+pcd坐标修正+点云转高度地图+lcm发布
-void
-cloud_cb (const sensor_msgs::PointCloud2ConstPtr& cloud_msg)
+// Cквозная фильтрация xyz + преобразование координат pcd + преобразование облака точек в карту высот + отправка lcm
+void cloud_cb (const sensor_msgs::PointCloud2ConstPtr& cloud_msg)
 {
     // Container for original & filtered data
     pcl::PointCloud<pcl::PointXYZ>::Ptr cloud(new pcl::PointCloud<pcl::PointXYZ>);//原始点云
@@ -66,12 +66,16 @@ cloud_cb (const sensor_msgs::PointCloud2ConstPtr& cloud_msg)
     // Convert ros type to PCL<xyz> data type
     pcl::fromROSMsg (*cloud_msg,*cloud);
 
+    ROS_INFO_STREAM("Get pc size : " << cloud->size());
+
 //    downsample降采样
     // Perform the actual filtering进行一个滤波处理
     pcl::VoxelGrid<pcl::PointXYZ> sor; //创建滤波对象
     sor.setInputCloud (cloud);  //设置输入的滤波，将需要过滤的点云给滤波对象
     sor.setLeafSize (0.01f, 0.01f, 0.01f);  //设置滤波时创建的体素大小为1cm立方体
     sor.filter (*downsampled);//执行滤波处理，存储输出cloud_filtered
+
+    ROS_INFO_STREAM("downsampled size : " << cloud->size());
 
 //    修正点云姿态
     float theta = -M_PI/6;//相机俯仰角30度
@@ -80,13 +84,17 @@ cloud_cb (const sensor_msgs::PointCloud2ConstPtr& cloud_msg)
     // 执行变换，并将结果保存在新创建的 rotated 中
     pcl::transformPointCloud (*downsampled, *rotated, transform);
 
-//    消除噪声点--半径滤波
+    ROS_INFO_STREAM("rotated size : " << rotated->size());
+
+//    Удаление шумовых точек (радиусная фильтрация)
     pcl::RadiusOutlierRemoval<pcl::PointXYZ> radiusoutlier;  //创建滤波器
     radiusoutlier.setInputCloud(rotated);    //设置输入点云
     radiusoutlier.setRadiusSearch(0.03);     //设置半径为100的范围内找临近点
     radiusoutlier.setMinNeighborsInRadius(3); //设置查询点的邻域点集数小于2的删除
     // 执行滤波，并将结果保存在新创建的 rotated 中
     radiusoutlier.filter(*filted);
+
+    ROS_INFO_STREAM("filted size : " << filted->size());
 
 ////    x轴范围限制
 //    // Perform the actual filtering
@@ -122,8 +130,10 @@ cloud_cb (const sensor_msgs::PointCloud2ConstPtr& cloud_msg)
     pcl::ConditionAnd<pcl::PointXYZ>::Ptr range_condition(new pcl::ConditionAnd<pcl::PointXYZ>());
     range_condition->addComparison(pcl::FieldComparison<pcl::PointXYZ>::ConstPtr(new pcl::FieldComparison<pcl::PointXYZ>("x", pcl::ComparisonOps::GT, -1.0)));  //GT表示大于等于
     range_condition->addComparison(pcl::FieldComparison<pcl::PointXYZ>::ConstPtr(new pcl::FieldComparison<pcl::PointXYZ>("x", pcl::ComparisonOps::LT, 1.0)));  //LT表示小于等于
+
     range_condition->addComparison(pcl::FieldComparison<pcl::PointXYZ>::ConstPtr(new pcl::FieldComparison<pcl::PointXYZ>("y", pcl::ComparisonOps::GT, -1.0)));  //GT表示大于等于
     range_condition->addComparison(pcl::FieldComparison<pcl::PointXYZ>::ConstPtr(new pcl::FieldComparison<pcl::PointXYZ>("y", pcl::ComparisonOps::LT, 0.7)));  //LT表示小于等于
+
     range_condition->addComparison(pcl::FieldComparison<pcl::PointXYZ>::ConstPtr(new pcl::FieldComparison<pcl::PointXYZ>("z", pcl::ComparisonOps::GT, 0.0)));  //GT表示大于等于
     range_condition->addComparison(pcl::FieldComparison<pcl::PointXYZ>::ConstPtr(new pcl::FieldComparison<pcl::PointXYZ>("z", pcl::ComparisonOps::LT, 2.0)));  //LT表示小于等于
 
@@ -133,6 +143,9 @@ cloud_cb (const sensor_msgs::PointCloud2ConstPtr& cloud_msg)
 //    condition.setKeepOrganized(true);
     //执行滤波并将滤波后的点云存储在xyzpassed中
     condition.filter(cloud_out);
+    pcl::copyPointCloud(*filted, cloud_out);
+
+    ROS_INFO_STREAM("ranged size : " << cloud_out.size());
 
 //     save data
 //    pcl::io::savePCDFileASCII ("/home/allen/catkin_ws/src/my_pcl/data/pcd_50610.pcd", cloud_out);//保存pcd
@@ -184,7 +197,7 @@ cloud_cb (const sensor_msgs::PointCloud2ConstPtr& cloud_msg)
             //output to file
             if (b1==true){
             std::ofstream outfile;
-            outfile.open("/home/amax/heightmaprough.txt",ios::app);
+            outfile.open(ros::package::getPath("camera_heightmap") + "/data/output_heightmap.txt",ios::app);
             outfile << heightnew_lcm.map[m][n] << std::endl;
             }
         }
@@ -245,7 +258,7 @@ cloud_cb (const sensor_msgs::PointCloud2ConstPtr& cloud_msg)
             if (b2== true&&bb==true)
             {
             std::ofstream outfile;
-            outfile.open("/home/allen/scoremap.txt",ios::app);
+            outfile.open(ros::package::getPath("camera_heightmap") + "/data/output_scoremap.txt",ios::app);
             outfile << trav_lcm.map[i][j] << std::endl;
             }
         } // y loop
@@ -264,7 +277,7 @@ main (int argc, char** argv)
 
     // Create a ROS subscriber for the input point cloud
     // 为接受点云数据创建一个订阅节点
-    ros::Subscriber sub = nh.subscribe<sensor_msgs::PointCloud2> ("camera/depth_registered/points", 1, cloud_cb);//astra
+    ros::Subscriber sub = nh.subscribe<sensor_msgs::PointCloud2> ("/pcl_load", 1, cloud_cb);//astra
 //    ros::Subscriber sub = nh.subscribe<sensor_msgs::PointCloud2> ("camera/depth/color/points", 1, cloud_cb);//realsense
 
     // Create a ROS publisher for the output point cloud

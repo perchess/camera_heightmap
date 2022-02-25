@@ -7,15 +7,14 @@
 #include <pcl/point_types.h>
 #include <pcl/io/pcd_io.h>
 #include <pcl/common/transforms.h>
-//滤波的头文件
+// Filters
 #include <pcl/filters/voxel_grid.h>
 #include <pcl/filters/passthrough.h>
 
-//申明发布器
+// global variable ?????!
 ros::Publisher pub;
-//回调函数
-void
-cloud_cb (const sensor_msgs::PointCloud2ConstPtr& cloud_msg)
+
+void cloud_cb (const sensor_msgs::PointCloud2ConstPtr& cloud_msg)
 {//tisu
     // 声明存储原始数据与滤波后的数据的点云的格式
 // Container for original & filtered data
@@ -52,8 +51,7 @@ cloud_cb (const sensor_msgs::PointCloud2ConstPtr& cloud_msg)
     pub.publish (output);
 }
 
-int
-main (int argc, char** argv)
+int main (int argc, char** argv)
 {
     // Initialize ROS
     ros::init (argc, argv, "downsample");//声明节点的名称

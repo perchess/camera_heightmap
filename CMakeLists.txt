@@ -13,6 +13,7 @@ find_package(catkin REQUIRED COMPONENTS
         sensor_msgs
         cv_bridge
         image_transport
+        roslib
 )
 find_package(OpenCV 4.2 EXACT REQUIRED)
 include_directories(${OpenCV_INCLUDE_DIRS})

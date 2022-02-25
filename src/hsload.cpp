@@ -1,6 +1,3 @@
-//
-// Created by allen on 2020/11/20.
-//
 #include <iostream>
 #include <ros/ros.h>
 #include <fstream>
@@ -9,8 +6,8 @@
 #include "traversability_float_t.hpp"
 #include "heightnew_t.hpp"
 #include "heightmap_t.hpp"
+#include <ros/package.h>
 
-#define DATA_DIR "/home/den/catkin_workspaces/visionMPC/src/camera_heightmap/data"
 
 using namespace std;
 int
@@ -26,7 +23,7 @@ main(int argc, char **argv)
 
 //    ifstream fin("/home/allen/catkin_ws/src/my_pcl/data/heightmaprough.txt", ios::in);
 //    ifstream fin("/home/allen/catkin_ws/src/my_pcl/data/heightmap18.txt", ios::in);
-    ifstream fin(DATA_DIR"/heightmap11.txt", ios::in);
+    ifstream fin(ros::package::getPath("camera_heightmap") + "/data/heightmap11.txt", ios::in);
     if(!fin)
     {
         std::cout << "The file" <<  "DATA_DIR" "/heightmap11.txt" << " is not exist!" << std::endl;
@@ -44,7 +41,7 @@ main(int argc, char **argv)
     fin.close();
 //    ifstream fin2("/home/allen/catkin_ws/src/my_pcl/data/scoremaprough.txt", ios::in);
 //    ifstream fin2("/home/allen/catkin_ws/src/my_pcl/data/scoremap18.txt", ios::in);
-    ifstream fin2(DATA_DIR"/scoremap11.txt", ios::in);
+    ifstream fin2(ros::package::getPath("camera_heightmap") + "/data/scoremap11.txt", ios::in);
     if(!fin2)
     {
         printf("The file 2 is not exist!");
@@ -59,7 +56,7 @@ main(int argc, char **argv)
     long iters;
     while (ros::ok()) {
         lcm.publish("local_heightmap", &heightnew_lcm);
-//        ros::Duration(0.1).sleep();//更新频率
+        ros::Rate(100).sleep();
         lcm.publish("traversability_float", &trav_lcm);
 
         iters ++;
