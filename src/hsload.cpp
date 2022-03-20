@@ -56,7 +56,7 @@ main(int argc, char **argv)
     long iters;
     while (ros::ok()) {
         lcm.publish("local_heightmap", &heightnew_lcm);
-        ros::Rate(100).sleep();
+        ros::Rate(25).sleep();
         lcm.publish("traversability_float", &trav_lcm);
 
         iters ++;

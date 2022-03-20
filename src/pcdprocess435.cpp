@@ -291,7 +291,7 @@ main (int argc, char** argv)
     // Create a ROS subscriber for the input point cloud
     // 为接受点云数据创建一个订阅节点
 //    ros::Subscriber sub = nh.subscribe<sensor_msgs::PointCloud2> ("camera/depth_registered/points", 1, cloud_cb);
-    ros::Subscriber sub = nh.subscribe<sensor_msgs::PointCloud2> ("camera/depth/color/points", 1, cloud_cb);
+    ros::Subscriber sub = nh.subscribe<sensor_msgs::PointCloud2> ("camera/depth/points", 1, cloud_cb);
 
     // Create a ROS publisher for the output point cloud
     //创建ROS的发布节点
