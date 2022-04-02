@@ -8,7 +8,18 @@
 #include "heightnew_t.hpp"
 #include "heightmap_t.hpp"
 
-
+//! @brief Шаблоннная функция для чтения параметров
+template <typename T>
+void readParam(const std::string param_name, T& param_value,
+               const T default_value)
+{
+  if (!ros::param::get(param_name, param_value)) {
+    ROS_WARN_STREAM("Parameter \""
+                    << param_name << "\" didn' find in Parameter Server."
+                    << "\nSetting default value: " << default_value);
+    param_value = default_value;
+  }
+}
 
 using namespace std;
 int main(int argc, char **argv)
@@ -19,10 +30,10 @@ int main(int argc, char **argv)
   std::string datadir = ros::package::getPath("camera_heightmap") + "/data/";
   std::string heightmap_name;
   std::string scoremap_name;
-  nh.param<std::string>("heightmap_name", heightmap_name, "heightmap22_scaled.txt");
-  nh.param<std::string>("scoremap_name", heightmap_name, "scoremap22.txt");
+  readParam("heightmap_name", heightmap_name, std::string("heightmap22_scaled.txt"));
+  readParam("scoremap_name", scoremap_name, std::string("scoremap22.txt"));
   lcm::LCM lcm;
-  heightmap_t heightnew_lcm;
+  heightnew_t heightnew_lcm;
   traversability_float_t trav_lcm;
 
   if (!lcm.good())
@@ -31,7 +42,7 @@ int main(int argc, char **argv)
     return 1;
   }
 
-  ifstream fin(datadir + heightmap_name, ios::in);
+  ifstream fin(datadir + "heightmap22_scaled.txt", ios::in);
   if(!fin)
   {
     std::cout << "The file" <<  datadir + heightmap_name<< " is not exist!" << std::endl;
@@ -48,7 +59,7 @@ int main(int argc, char **argv)
   }
   fin.close();
 
-  ifstream fin2(datadir + scoremap_name, ios::in);
+  ifstream fin2(datadir + "scoremap22.txt", ios::in);
   if(!fin2)
   {
     std::cout << "The file" <<  datadir + scoremap_name << " is not exist!" << std::endl;
@@ -62,7 +73,7 @@ int main(int argc, char **argv)
   fin2.close();
   long iters;
   while (ros::ok()) {
-    lcm.publish("local_heightmap", &heightnew_lcm);
+    lcm.publish("heightmapnew", &heightnew_lcm);
     ros::Rate(25).sleep();
     lcm.publish("traversability_float", &trav_lcm);
 

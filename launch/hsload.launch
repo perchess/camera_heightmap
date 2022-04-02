@@ -1,6 +1,6 @@
 <launch>
     <node name="hs_publisher" pkg="camera_heightmap" type="hsload" respawn="true" output="screen">
-        <param name="heightmap_name" value="heightmap22.txt"/>
-        <param name="scoremap_name" value="scoremap22.txt"/>
+        <param name="heightmap_name" value="heightmap11.txt"/>
+        <param name="scoremap_name" value="scoremap11.txt"/>
     </node>
 </launch>
