@@ -18,12 +18,13 @@ main(int argc, char **argv)
     lcm::LCM lcm;
     heightmap_t heightnew_lcm;//高度地图矩阵
     traversability_float_t trav_lcm;
+    string dir = ros::package::getPath("camera_heightmap") + "/data/";
     if (!lcm.good())
         return 1;
 
 //    ifstream fin("/home/allen/catkin_ws/src/my_pcl/data/heightmaprough.txt", ios::in);
 //    ifstream fin("/home/allen/catkin_ws/src/my_pcl/data/heightmap18.txt", ios::in);
-    ifstream fin(ros::package::getPath("camera_heightmap") + "/data/heightmap11.txt", ios::in);
+    ifstream fin(dir + "heightmap22.txt", ios::in);
     if(!fin)
     {
         std::cout << "The file" <<  "DATA_DIR" "/heightmap11.txt" << " is not exist!" << std::endl;
@@ -41,7 +42,7 @@ main(int argc, char **argv)
     fin.close();
 //    ifstream fin2("/home/allen/catkin_ws/src/my_pcl/data/scoremaprough.txt", ios::in);
 //    ifstream fin2("/home/allen/catkin_ws/src/my_pcl/data/scoremap18.txt", ios::in);
-    ifstream fin2(ros::package::getPath("camera_heightmap") + "/data/scoremap11.txt", ios::in);
+    ifstream fin2(dir + "scoremap22.txt", ios::in);
     if(!fin2)
     {
         printf("The file 2 is not exist!");
