@@ -1,0 +1,9 @@
+<?xml version="1.0"?>
+<launch>
+    <node name="heightmap_scaler" pkg="camera_heightmap" type="scale_heightmap"
+    respawn="false" output="screen">
+        <param name="scale" value="2"/>
+        <param name="in_filename" value="heightmap22"/>
+        <param name="dir" value="$(find camera_heightmap)/data/"/>
+    </node>
+</launch>
