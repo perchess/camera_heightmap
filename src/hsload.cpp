@@ -30,8 +30,8 @@ int main(int argc, char **argv)
   std::string datadir = ros::package::getPath("camera_heightmap") + "/data/";
   std::string heightmap_name;
   std::string scoremap_name;
-  readParam("heightmap_name", heightmap_name, std::string("heightmap22_scaled.txt"));
-  readParam("scoremap_name", scoremap_name, std::string("scoremap22.txt"));
+  readParam("~heightmap_name", heightmap_name, std::string("heightmap22_scaled.txt"));
+  readParam("~scoremap_name", scoremap_name, std::string("scoremap22.txt"));
   lcm::LCM lcm;
   heightnew_t heightnew_lcm;
   traversability_float_t trav_lcm;
